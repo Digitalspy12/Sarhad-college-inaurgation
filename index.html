@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Internal Hackathon 2026 — Sarhad College</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & ROOT ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:     #00ff41;
+  --green-dim: #00862a;
+  --green-glow: rgba(0,255,65,.28);
+  --cyan:      #00d4ff;
+  --orange:    #ff6b00;
+  --orange-glow: rgba(255,107,0,.35);
+  --gold:      #ffd700;
+  --white:     #dfffdf;
+  --bg:        #000a00;
+  --ft:        'VT323', monospace;
+  --fc:        'Share Tech Mono', monospace;
+  --fd:        'Bebas Neue', sans-serif;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  color: var(--green);
+  font-family: var(--ft);
+  overflow: hidden;
+  user-select: none;
+  cursor: crosshair;
+}
+
+/* CRT scanlines */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9000;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent, transparent 3px,
+    rgba(0,0,0,.13) 3px, rgba(0,0,0,.13) 4px
+  );
+  pointer-events: none;
+}
+
+/* Vignette */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9001;
+  background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 55%, rgba(0,0,0,.75) 100%);
+  pointer-events: none;
+}
+
+/* ── SCREENS ──────────────────────────────────────── */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(24px, 5vw, 64px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease;
+}
+.screen.active { opacity: 1; pointer-events: all; }
+
+/* ── UTILITIES ────────────────────────────────────── */
+@keyframes blink    { 0%,100%{opacity:1}50%{opacity:0} }
+@keyframes glow-pulse {
+  0%,100%{ text-shadow: 0 0 16px var(--green), 0 0 48px var(--green-glow); }
+  50%    { text-shadow: 0 0 32px var(--green), 0 0 80px var(--green-glow), 0 0 120px var(--green-glow); }
+}
+@keyframes pop-in {
+  0%   { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+@keyframes slide-up {
+  0%   { transform: translateY(32px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+@keyframes enter-ring-pulse {
+  0%,100%{ box-shadow:0 0 40px 6px var(--orange-glow), inset 0 0 32px rgba(255,107,0,.08); }
+  50%    { box-shadow:0 0 70px 14px var(--orange-glow), inset 0 0 56px rgba(255,107,0,.16); }
+}
+@keyframes flash-screen {
+  0%  { opacity:.25; }
+  100%{ opacity:0; }
+}
+
+.cursor {
+  display: inline-block; width: 10px; height: 1em;
+  background: var(--green); vertical-align: middle;
+  animation: blink .8s step-end infinite; margin-left: 4px;
+}
+
+/* ── SCREEN 0: INTRO ──────────────────────────────── */
+#s-intro { gap: 10px; }
+
+.intro-college {
+  font-family: var(--fd);
+  font-size: clamp(22px, 4.5vw, 62px);
+  letter-spacing: clamp(4px, 1.2vw, 14px);
+  color: var(--green);
+  animation: glow-pulse 2.5s ease-in-out infinite;
+  text-align: center;
+}
+
+.intro-dept {
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.3vw, 17px);
+  letter-spacing: clamp(3px, .8vw, 8px);
+  color: var(--green-dim);
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.intro-cta {
+  font-family: var(--fc);
+  font-size: clamp(12px, 1.6vw, 20px);
+  letter-spacing: 6px;
+  color: var(--green-dim);
+  animation: blink 1.4s infinite;
+  text-align: center;
+}
+
+/* ── SCREEN 1: COUNTDOWN ──────────────────────────── */
+#s-countdown { gap: 16px; }
+
+.cdwn-label {
+  font-family: var(--fc);
+  font-size: clamp(11px, 1.4vw, 18px);
+  letter-spacing: 5px;
+  color: var(--green-dim);
+  text-align: center;
+}
+
+#cdwn-num {
+  font-family: var(--fd);
+  font-size: clamp(130px, 24vw, 290px);
+  line-height: .9;
+  text-align: center;
+  animation: pop-in .7s cubic-bezier(.16,1,.3,1);
+  text-shadow: 0 0 24px var(--green), 0 0 80px var(--green-glow), 0 0 160px var(--green-glow);
+}
+#cdwn-num.orange {
+  color: var(--orange);
+  text-shadow: 0 0 24px var(--orange), 0 0 80px var(--orange-glow);
+}
+
+/* ── SCREEN 2: BOOT ───────────────────────────────── */
+#s-boot { gap: 20px; }
+
+.boot-header {
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.1vw, 14px);
+  letter-spacing: 4px;
+  color: var(--green-dim);
+  text-align: center;
+}
+
+.term-window {
+  width: min(780px, 92vw);
+  border: 1px solid var(--green-dim);
+  box-shadow: 0 0 40px var(--green-glow), inset 0 0 30px rgba(0,255,65,.02);
+  background: rgba(0,255,65,.018);
+  padding: clamp(20px, 3vw, 36px) clamp(24px, 4vw, 44px);
+}
+
+.term-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0,255,65,.15);
+}
+.term-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--green-dim); opacity: .5;
+}
+
+.boot-line {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--fc);
+  font-size: clamp(13px, 1.8vw, 21px);
+  line-height: 1.9;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .25s, transform .25s;
+  white-space: nowrap;
+}
+.boot-line.show { opacity:1; transform: translateY(0); }
+.boot-line .prompt { color: var(--green-dim); }
+.boot-line .lbl    { flex:1; color: var(--white); }
+.boot-line .dots   { color: rgba(0,255,65,.3); }
+.boot-line .status-ok  { color: var(--green); font-weight: bold; }
+.boot-line .status-ld  { color: var(--gold);  font-weight: bold; animation: blink .6s infinite; }
+
+.boot-bar-wrap {
+  margin: 20px 0 4px;
+  height: 5px;
+  background: rgba(0,255,65,.1);
+  border: 1px solid rgba(0,255,65,.2);
+  overflow: hidden;
+}
+.boot-bar-fill {
+  height: 100%;
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+  width: 0%; transition: width .9s ease;
+}
+
+#sys-ready {
+  font-family: var(--fd);
+  font-size: clamp(28px, 5vw, 66px);
+  letter-spacing: 10px;
+  color: var(--green);
+  text-shadow: 0 0 24px var(--green), 0 0 64px var(--green-glow);
+  text-align: center;
+  margin-top: 12px;
+  opacity: 0; transition: opacity .6s;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+#sys-ready.show { opacity: 1; }
+
+/* ── SCREEN 3: FIVE MINDS ─────────────────────────── */
+#s-minds { gap: 0; }
+
+.minds-title {
+  font-family: var(--fd);
+  font-size: clamp(26px, 5vw, 68px);
+  letter-spacing: clamp(4px, 1vw, 12px);
+  color: var(--green);
+  text-shadow: 0 0 20px var(--green-glow);
+  text-align: center;
+  margin-bottom: 6px;
+}
+.minds-sub {
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.2vw, 14px);
+  letter-spacing: 4px; color: var(--green-dim);
+  text-align: center; margin-bottom: 36px;
+}
+
+.minds-row {
+  display: flex; gap: clamp(12px, 2.5vw, 36px);
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.mind-card {
+  position: relative;
+  width: clamp(100px, 14vw, 155px);
+  height: clamp(100px, 14vw, 155px);
+  border: 2px solid var(--green-dim);
+  background: rgba(0,255,65,.03);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  cursor: pointer;
+  clip-path: polygon(12% 0%,88% 0%,100% 12%,100% 88%,88% 100%,12% 100%,0% 88%,0% 12%);
+  transition: background .25s, border-color .25s, box-shadow .25s;
+}
+.mind-card:hover { background: rgba(0,255,65,.07); border-color: var(--green); }
+.mind-card.active {
+  background: rgba(0,255,65,.14);
+  border-color: var(--green);
+  box-shadow: 0 0 32px var(--green-glow), 0 0 64px rgba(0,255,65,.1);
+  animation: pop-in .4s ease-out;
+}
+.mind-card .m-key {
+  position: absolute; top: 6px; right: 10px;
+  font-family: var(--fc); font-size: 10px;
+  color: rgba(0,255,65,.35); letter-spacing: 1px;
+}
+.mind-card .m-icon {
+  font-size: clamp(28px, 4.5vw, 52px);
+  filter: grayscale(1) brightness(.6);
+  transition: filter .3s;
+}
+.mind-card.active .m-icon { filter: grayscale(0) brightness(1); }
+.mind-card .m-label {
+  font-family: var(--fc);
+  font-size: clamp(9px, 1vw, 12px);
+  letter-spacing: 3px; color: var(--green-dim);
+  transition: color .3s;
+}
+.mind-card.active .m-label { color: var(--green); }
+.mind-card .m-status {
+  font-family: var(--fc); font-size: 10px;
+  letter-spacing: 2px; color: var(--green);
+  opacity: 0; transition: opacity .3s;
+  margin-top: 2px;
+}
+.mind-card.active .m-status { opacity: 1; }
+
+.minds-tally {
+  font-family: var(--fc);
+  font-size: clamp(12px, 1.5vw, 17px);
+  letter-spacing: 3px; color: var(--green-dim);
+  text-align: center;
+}
+
+/* ── SCREEN 3.5: LAUNCH ───────────────────────────── */
+#s-launch { gap: 20px; text-align: center; }
+
+.launch-pre {
+  font-family: var(--fc);
+  font-size: clamp(12px, 1.6vw, 18px);
+  letter-spacing: 5px; color: var(--cyan);
+}
+
+#launch-display {
+  display: flex; align-items: center; justify-content: center;
+}
+
+#launch-num {
+  font-family: var(--fd);
+  font-size: clamp(110px, 22vw, 260px);
+  line-height: .9;
+  color: var(--orange);
+  text-shadow: 0 0 24px var(--orange), 0 0 80px var(--orange-glow);
+  animation: pop-in .8s cubic-bezier(.16,1,.3,1);
+}
+
+.launch-word {
+  font-family: var(--fd);
+  font-size: clamp(60px, 13vw, 160px);
+  letter-spacing: 18px;
+  color: var(--orange);
+  text-shadow: 0 0 30px var(--orange), 0 0 90px var(--orange-glow), 0 0 160px rgba(255,107,0,.2);
+  animation: pop-in .5s cubic-bezier(.16,1,.3,1);
+}
+
+/* ── SCREEN 4: CHIEF GUEST ────────────────────────── */
+#s-chief { gap: 12px; }
+
+.chief-label {
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.3vw, 15px);
+  letter-spacing: 5px; color: var(--green-dim);
+  text-align: center; margin-bottom: 4px;
+}
+.chief-title {
+  font-family: var(--fd);
+  font-size: clamp(20px, 3.5vw, 46px);
+  letter-spacing: clamp(4px, 1vw, 10px);
+  color: var(--white);
+  text-align: center; margin-bottom: 40px;
+}
+
+.enter-btn {
+  position: relative;
+  width: clamp(170px, 22vw, 270px);
+  height: clamp(170px, 22vw, 270px);
+  border-radius: 50%;
+  border: 3px solid var(--orange);
+  background: radial-gradient(circle, rgba(255,107,0,.18) 0%, rgba(255,107,0,.02) 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  animation: enter-ring-pulse 2.2s ease-in-out infinite;
+  transition: transform .12s, background .15s;
+}
+.enter-btn:hover { background: radial-gradient(circle, rgba(255,107,0,.32) 0%, rgba(255,107,0,.06) 100%); }
+.enter-btn:active { transform: scale(.95); }
+.enter-btn::before {
+  content: '';
+  position: absolute; inset: -12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,107,0,.25);
+}
+.enter-btn::after {
+  content: '';
+  position: absolute; inset: -22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,107,0,.12);
+}
+.enter-lbl {
+  font-family: var(--fd);
+  font-size: clamp(32px, 5.5vw, 62px);
+  letter-spacing: 8px; color: var(--orange);
+  text-shadow: 0 0 20px var(--orange);
+}
+.enter-sub {
+  font-family: var(--fc);
+  font-size: clamp(9px, 1vw, 12px);
+  letter-spacing: 3px; color: rgba(255,107,0,.55);
+  margin-top: 4px; text-align: center;
+}
+.chief-kb {
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.1vw, 13px);
+  letter-spacing: 3px; color: rgba(0,255,65,.2);
+  text-align: center; margin-top: 32px;
+}
+
+/* ── SCREEN 5: ACCESS GRANTED ─────────────────────── */
+#s-access { }
+
+.access-wrap {
+  width: min(760px, 92vw);
+  font-family: var(--fc);
+}
+.access-line {
+  font-size: clamp(14px, 2.2vw, 26px);
+  letter-spacing: 2px; line-height: 2;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .25s, transform .25s;
+}
+.access-line.show { opacity:1; transform:translateY(0); }
+
+.access-big {
+  font-family: var(--fd);
+  font-size: clamp(26px, 5vw, 70px);
+  letter-spacing: 10px;
+  color: var(--green);
+  text-shadow: 0 0 24px var(--green), 0 0 70px var(--green-glow);
+  text-align: center;
+  opacity: 0; transition: opacity .4s;
+}
+.access-big.show { opacity:1; }
+
+.hackathon-started {
+  font-family: var(--fd);
+  font-size: clamp(30px, 6.5vw, 88px);
+  letter-spacing: clamp(6px, 1.5vw, 18px);
+  color: var(--green);
+  text-shadow: 0 0 30px var(--green), 0 0 80px var(--green-glow);
+  text-align: center;
+  opacity:0; transition: opacity .5s;
+}
+.hackathon-started.show { opacity:1; }
+
+.progress-row {
+  font-size: clamp(18px, 3vw, 38px);
+  letter-spacing: 2px;
+  color: var(--green);
+  text-shadow: 0 0 10px var(--green);
+  text-align: center;
+  opacity:0; transition:opacity .3s;
+}
+.progress-row.show { opacity:1; }
+
+/* ── SCREEN 6: TEAM REVEAL ────────────────────────── */
+#s-teams {}
+
+.team-counter {
+  position: fixed; top: clamp(20px, 3vw, 36px); right: clamp(24px, 4vw, 48px);
+  font-family: var(--fc);
+  font-size: clamp(12px, 1.4vw, 17px);
+  letter-spacing: 3px; color: var(--green-dim);
+  z-index: 100;
+}
+
+.team-wrap { text-align: center; width: 100%; }
+
+.team-num-badge {
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.2vw, 14px);
+  letter-spacing: 5px; color: var(--green-dim);
+  margin-bottom: 10px;
+  animation: slide-up .5s ease-out;
+}
+
+.team-initials {
+  font-family: var(--fd);
+  font-size: clamp(80px, 18vw, 210px);
+  line-height: .9;
+  color: var(--green);
+  text-shadow: 0 0 24px var(--green), 0 0 80px var(--green-glow);
+  letter-spacing: 12px;
+  animation: slide-up .5s cubic-bezier(.16,1,.3,1);
+}
+
+.team-name-big {
+  font-family: var(--fd);
+  font-size: clamp(32px, 6.5vw, 86px);
+  letter-spacing: 12px;
+  color: var(--white);
+  animation: slide-up .55s cubic-bezier(.16,1,.3,1) .08s both;
+}
+
+.team-members-list {
+  font-family: var(--fc);
+  font-size: clamp(12px, 1.6vw, 20px);
+  letter-spacing: 3px; color: var(--green-dim);
+  margin: 12px 0;
+  animation: slide-up .55s ease-out .14s both;
+}
+
+.team-ps {
+  display: inline-block;
+  font-family: var(--fc);
+  font-size: clamp(11px, 1.3vw, 17px);
+  letter-spacing: 2px; color: var(--cyan);
+  padding: 10px 22px;
+  border: 1px solid rgba(0,212,255,.3);
+  background: rgba(0,212,255,.05);
+  margin-top: 10px;
+  animation: slide-up .55s ease-out .2s both;
+}
+
+.team-nav-hint {
+  position: fixed; bottom: clamp(16px, 3vw, 36px); left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.1vw, 13px);
+  letter-spacing: 3px; color: rgba(0,255,65,.25);
+  animation: blink 2.2s infinite;
+  white-space: nowrap;
+}
+
+/* ── SCREEN 7: COMBINE ────────────────────────────── */
+#s-combine { gap: 0; text-align: center; }
+
+.combine-header {
+  font-family: var(--fc);
+  font-size: clamp(10px, 1.2vw, 14px);
+  letter-spacing: 5px; color: var(--green-dim);
+  margin-bottom: 28px;
+}
+
+.combine-row {
+  display: flex; gap: clamp(10px, 2vw, 28px);
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.ci-chip {
+  font-family: var(--fd);
+  font-size: clamp(26px, 4.5vw, 58px);
+  color: var(--green);
+  text-shadow: 0 0 16px var(--green-glow);
+  letter-spacing: 4px;
+  padding: 4px 12px;
+  border: 1px solid rgba(0,255,65,.2);
+  background: rgba(0,255,65,.04);
+  opacity: 0; transform: translateY(18px);
+  transition: opacity .35s, transform .35s;
+}
+.ci-chip.show { opacity:1; transform: translateY(0); }
+
+.combine-arrow {
+  font-family: var(--fc);
+  font-size: clamp(11px, 1.2vw, 14px);
+  letter-spacing: 4px; color: var(--green-dim);
+  margin: 16px 0 10px;
+  opacity:0; transition: opacity .4s;
+}
+.combine-arrow.show { opacity:1; }
+
+.combine-title {
+  font-family: var(--fd);
+  font-size: clamp(34px, 7vw, 96px);
+  letter-spacing: clamp(6px, 1.5vw, 20px);
+  color: var(--white);
+  text-shadow: 0 0 40px var(--green-glow);
+  opacity: 0; transform: scale(.9);
+  transition: opacity .7s, transform .7s;
+}
+.combine-title.show { opacity:1; transform: scale(1); }
+
+/* ── SCREEN 8: FINAL ──────────────────────────────── */
+#s-final { gap: clamp(8px, 1.5vw, 18px); text-align: center; }
+
+.final-line {
+  font-family: var(--fd);
+  font-size: clamp(24px, 4.8vw, 66px);
+  letter-spacing: clamp(4px, 1vw, 12px);
+  color: var(--white);
+  opacity:0; transform: translateY(18px);
+  transition: opacity .55s, transform .55s;
+}
+.final-line.show { opacity:1; transform:translateY(0); }
+
+.final-hn {
+  font-family: var(--fd);
+  font-size: clamp(40px, 9vw, 116px);
+  letter-spacing: clamp(8px, 2vw, 24px);
+  color: var(--green);
+  text-shadow: 0 0 32px var(--green), 0 0 80px var(--green-glow);
+  opacity:0; transition: opacity .7s;
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+.final-hn.show { opacity:1; }
+
+.final-tag {
+  font-family: var(--fc);
+  font-size: clamp(13px, 1.8vw, 22px);
+  letter-spacing: clamp(4px, 1.2vw, 12px);
+  color: var(--green-dim);
+  opacity:0; transition: opacity .7s;
+}
+.final-tag.show { opacity:1; }
+
+.final-cta {
+  font-family: var(--fd);
+  font-size: clamp(22px, 4vw, 56px);
+  letter-spacing: clamp(4px, 1vw, 10px);
+  color: var(--orange);
+  text-shadow: 0 0 20px var(--orange);
+  margin-top: 10px;
+  opacity:0; transition: opacity .7s;
+}
+.final-cta.show { opacity:1; }
+
+/* ── FLASH OVERLAY ────────────────────────────────── */
+#flash {
+  position: fixed; inset:0; z-index:8990;
+  background: var(--green);
+  opacity:0; pointer-events:none;
+  transition: opacity .3s;
+}
+
+/* ── CONTROLS HINT ────────────────────────────────── */
+#ctrl-hint {
+  position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+  font-family: var(--fc); font-size: 10px;
+  letter-spacing: 2px; color: rgba(0,255,65,.15);
+  z-index: 9990; white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+<!-- ── S0: INTRO ──────────────────────────────────── -->
+<div class="screen active" id="s-intro">
+  <div class="intro-college">SARHAD COLLEGE OF ENGINEERING</div>
+  <div class="intro-dept">DEPARTMENT OF COMPUTER SCIENCE &amp; INFORMATION TECHNOLOGY</div>
+  <div class="intro-cta">[ CLICK ANYWHERE TO INITIALIZE SYSTEM ]<span class="cursor"></span></div>
+</div>
+
+<!-- ── S1: COUNTDOWN ──────────────────────────────── -->
+<div class="screen" id="s-countdown">
+  <div class="cdwn-label">SYSTEM INITIALIZATION IN</div>
+  <div id="cdwn-num">10</div>
+</div>
+
+<!-- ── S2: BOOT ────────────────────────────────────── -->
+<div class="screen" id="s-boot">
+  <div class="boot-header">// INTERNAL HACKATHON 2026 — BOOT SEQUENCE</div>
+  <div class="term-window">
+    <div class="term-bar">
+      <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+      <span style="font-family:var(--fc);font-size:12px;color:var(--green-dim);margin-left:8px;letter-spacing:3px;">HACKATHON_OS v2.0.26</span>
+    </div>
+    <div class="boot-line" id="bl-0"><span class="prompt">&gt;</span><span class="lbl">SYSTEM BOOTING</span><span class="dots">............</span><span class="status-ld" id="st-0">LOADING</span></div>
+    <div class="boot-line" id="bl-1"><span class="prompt">&gt;</span><span class="lbl">Initializing Innovation</span><span class="dots">.......</span><span class="status-ok">DONE</span></div>
+    <div class="boot-line" id="bl-2"><span class="prompt">&gt;</span><span class="lbl">Loading Creativity</span><span class="dots">...........</span><span class="status-ok">DONE</span></div>
+    <div class="boot-line" id="bl-3"><span class="prompt">&gt;</span><span class="lbl">Loading Teamwork</span><span class="dots">............</span><span class="status-ok">DONE</span></div>
+    <div class="boot-line" id="bl-4"><span class="prompt">&gt;</span><span class="lbl">Loading Problem Solving</span><span class="dots">.....</span><span class="status-ok">DONE</span></div>
+    <div class="boot-line" id="bl-5"><span class="prompt">&gt;</span><span class="lbl">Loading Future Engineers</span><span class="dots">....</span><span class="status-ok">DONE</span></div>
+    <div class="boot-bar-wrap"><div class="boot-bar-fill" id="boot-bar"></div></div>
+    <div id="sys-ready">SYSTEM READY<span class="cursor"></span></div>
+  </div>
+</div>
+
+<!-- ── S3: FIVE MINDS ─────────────────────────────── -->
+<div class="screen" id="s-minds">
+  <div class="minds-title">FIVE MINDS. ONE MISSION.</div>
+  <div class="minds-sub">[ EACH STUDENT STEPS UP AND ACTIVATES THEIR ELEMENT ]</div>
+  <div class="minds-row" id="minds-row"></div>
+  <div class="minds-tally" id="minds-tally">AWAITING ACTIVATION &nbsp;—&nbsp; 0 / 5</div>
+</div>
+
+<!-- ── S3.5: LAUNCH ───────────────────────────────── -->
+<div class="screen" id="s-launch">
+  <div class="launch-pre">ALL SYSTEMS ACTIVATED — INITIATING LAUNCH SEQUENCE</div>
+  <div id="launch-display"><div id="launch-num">5</div></div>
+</div>
+
+<!-- ── S4: CHIEF GUEST ────────────────────────────── -->
+<div class="screen" id="s-chief">
+  <div class="chief-label">AWAITING CHIEF GUEST AUTHORIZATION</div>
+  <div class="chief-title">PRESS TO OFFICIALLY LAUNCH THE HACKATHON</div>
+  <div class="enter-btn" id="enter-btn">
+    <div class="enter-lbl">ENTER</div>
+    <div class="enter-sub">[ LAUNCH HACKATHON ]</div>
+  </div>
+  <div class="chief-kb">— OR PRESS ENTER ON KEYBOARD —</div>
+</div>
+
+<!-- ── S5: ACCESS GRANTED ─────────────────────────── -->
+<div class="screen" id="s-access">
+  <div class="access-wrap" id="access-wrap"></div>
+</div>
+
+<!-- ── S6: TEAM REVEAL ────────────────────────────── -->
+<div class="screen" id="s-teams">
+  <div class="team-counter" id="team-counter">TEAM 01 / 06</div>
+  <div class="team-wrap" id="team-display"></div>
+  <div class="team-nav-hint">[ CLICK &nbsp;OR&nbsp; → &nbsp;FOR NEXT TEAM ]</div>
+</div>
+
+<!-- ── S7: COMBINE ────────────────────────────────── -->
+<div class="screen" id="s-combine">
+  <div class="combine-header">ALL TEAMS. UNITED.</div>
+  <div class="combine-row" id="combine-chips"></div>
+  <div class="combine-arrow" id="combine-arrow">CONVERGING INTO ↓</div>
+  <div class="combine-title" id="combine-title">INTERNAL HACKATHON 2026</div>
+</div>
+
+<!-- ── S8: FINAL ──────────────────────────────────── -->
+<div class="screen" id="s-final">
+  <div class="final-line" id="f1">THE PROBLEMS ARE REAL.</div>
+  <div class="final-line" id="f2">THE IDEAS ARE READY.</div>
+  <div class="final-line" id="f3">THE BUILDERS ARE HERE.</div>
+  <div class="final-hn" id="fhn">INTERNAL HACKATHON 2026</div>
+  <div class="final-tag" id="ftag">IDEATE &nbsp;•&nbsp; INNOVATE &nbsp;•&nbsp; IMPLEMENT</div>
+  <div class="final-cta" id="fcta">🚀 &nbsp;LET THE BUILD BEGIN</div>
+</div>
+
+<div id="ctrl-hint">SPACE / CLICK — ADVANCE &nbsp;|&nbsp; 1–5 — ACTIVATE MIND &nbsp;|&nbsp; ← → — TEAMS &nbsp;|&nbsp; F — FULLSCREEN</div>
+
+<!-- ══════════════════════════════════════════════════
+     CONFIGURATION  ← Edit this section for your event
+═══════════════════════════════════════════════════ -->
+<script>
+const CFG = {
+  college:  "SARHAD COLLEGE OF ENGINEERING",
+  hackathon: "INTERNAL HACKATHON 2026",
+  tagline:   "IDEATE • INNOVATE • IMPLEMENT",
+
+  minds: [
+    { emoji:"💻", label:"CODING",       key:"1" },
+    { emoji:"💡", label:"INNOVATION",   key:"2" },
+    { emoji:"🎨", label:"CREATIVITY",   key:"3" },
+    { emoji:"🤝", label:"TEAMWORK",     key:"4" },
+    { emoji:"🌍", label:"IMPACT",       key:"5" },
+  ],
+
+  // ─── Add / remove teams here ───────────────────
+  teams: [
+    { name:"DIGITALSPY",         init:"DS", members:["—","—","—"], ps:"" },
+    { name:"GROWWELL",           init:"GW", members:["—","—","—"], ps:"" },
+    { name:"TECH TITANS",        init:"TT", members:["—","—","—"], ps:"" },
+    { name:"NODE KNIGHT",        init:"NK", members:["—","—","—"], ps:"" },
+    { name:"INNOVATORS UNITED",  init:"IU", members:["—","—","—"], ps:"" },
+    { name:"HACKSTORMS",         init:"HS", members:["—","—","—"], ps:"" },
+    { name:"VISION",             init:"VI", members:["—","—","—"], ps:"" },
+    { name:"DIGITAL VIRASAT",    init:"DV", members:["—","—","—"], ps:"" },
+    { name:"TECH-KAIROS",        init:"TK", members:["—","—","—"], ps:"" },
+    { name:"APEX",               init:"AP", members:["—","—","—"], ps:"" },
+    { name:"GLADIATORS",         init:"GL", members:["—","—","—"], ps:"" },
+    { name:"TECH HUSTLER",       init:"TH", members:["—","—","—"], ps:"" },
+    { name:"FLOW VISIONERS",     init:"FV", members:["—","—","—"], ps:"" },
+    { name:"TECHNOVA",           init:"TN", members:["—","—","—"], ps:"" },
+    { name:"QUANTUM SQUAD",      init:"QS", members:["—","—","—"], ps:"" },
+    { name:"TECHMINDS",          init:"TM", members:["—","—","—"], ps:"" },
+    { name:"HACKLIVE",           init:"HL", members:["—","—","—"], ps:"" },
+    { name:"TEAM ALPHA",         init:"TA", members:["—","—","—"], ps:"" },
+    { name:"HER HEALTH HUB",     init:"HH", members:["—","—","—"], ps:"" },
+    { name:"VISION BRIDGE",      init:"VB", members:["—","—","—"], ps:"" },
+    { name:"LEGALLENS",          init:"LL", members:["—","—","—"], ps:"" },
+    { name:"TEAM 18",            init:"T8", members:["—","—","—"], ps:"" },
+    { name:"QUANTUM",            init:"QM", members:["—","—","—"], ps:"" },
+    { name:"INNOVE HER",         init:"IH", members:["—","—","—"], ps:"" },
+    { name:"CODE4FOOD",          init:"C4", members:["—","—","—"], ps:"" },
+  ]
+};
+/* ══════════════════════════════════════════════════ */
+
+/* ── STATE ─────────────────────────────────────── */
+let ST = 'intro';
+let mindsOn = 0, mindsArr = [false,false,false,false,false];
+let teamIdx  = 0;
+let audioCtx = null;
+
+/* ── AUDIO ─────────────────────────────────────── */
+function ctx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function tone(freq, dur, type='square', vol=.12) {
+  try {
+    const c=ctx(), o=c.createOscillator(), g=c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, c.currentTime+dur);
+    o.start(); o.stop(c.currentTime+dur);
+  } catch(e){}
+}
+const sfx = {
+  tick:    ()=> tone(440,.08,'square',.1),
+  tickLow: ()=> tone(330,.08,'square',.1),
+  hi:      ()=> tone(880,.09,'square',.12),
+  boot:    ()=> [440,550,660].forEach((f,i)=>setTimeout(()=>tone(f,.08,'square',.1),i*55)),
+  activate:()=> [330,440,660,880].forEach((f,i)=>setTimeout(()=>tone(f,.11,'square',.13),i*45)),
+  allOn:   ()=> [220,330,440,550,660,880].forEach((f,i)=>setTimeout(()=>tone(f,.14,'sawtooth',.11),i*38)),
+  launch:  (n)=> tone(200+n*50,.28,'sawtooth',.18),
+  enter:   ()=> {
+    [110,220,440,880,1760].forEach((f,i)=>setTimeout(()=>tone(f,.18,'square',.13),i*75));
+    setTimeout(()=>[880,1100,1320].forEach((f,i)=>setTimeout(()=>tone(f,.38,'sawtooth',.18),i*55)),520);
+  },
+  team:    ()=> { tone(660,.07,'square',.09); setTimeout(()=>tone(880,.11,'square',.11),75); },
+  final:   ()=> [220,330,440,550,660,770,880,1100].forEach((f,i)=>setTimeout(()=>tone(f,.22,'sawtooth',.1),i*55)),
+};
+
+/* ── SCREEN SWITCH ─────────────────────────────── */
+function show(id) {
+  const fl=document.getElementById('flash');
+  fl.style.transition='opacity .04s'; fl.style.opacity='.18';
+  setTimeout(()=>{ fl.style.transition='opacity .32s'; fl.style.opacity='0'; },80);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── PHASE: COUNTDOWN ──────────────────────────── */
+function startCountdown() {
+  ST='countdown'; show('s-countdown');
+  const el=document.getElementById('cdwn-num');
+  let n=10; el.textContent=n; el.className=''; sfx.tick();
+
+  const iv=setInterval(()=>{
+    n--;
+    el.style.animation='none'; void el.offsetWidth; el.style.animation='pop-in .7s cubic-bezier(.16,1,.3,1)';
+    if(n<=3){ el.className='orange'; sfx.hi(); } else sfx.tick();
+    if(n===0){ clearInterval(iv); el.textContent=''; setTimeout(startBoot,350); return; }
+    el.textContent=n;
+  },1000);
+}
+
+/* ── PHASE: BOOT ───────────────────────────────── */
+function startBoot() {
+  ST='boot'; show('s-boot');
+  document.querySelectorAll('.boot-line').forEach(l=>l.classList.remove('show'));
+  document.getElementById('sys-ready').classList.remove('show');
+  document.getElementById('boot-bar').style.width='0%';
+  document.getElementById('st-0').textContent='LOADING';
+
+  const delays=[0,650,1250,1850,2450,3050];
+  delays.forEach((d,i)=>{
+    setTimeout(()=>{
+      document.getElementById('bl-'+i).classList.add('show');
+      sfx.boot();
+      if(i===0) setTimeout(()=>{ document.getElementById('st-0').textContent='DONE'; document.getElementById('st-0').className='status-ok'; },420);
+      document.getElementById('boot-bar').style.width=((i+1)/delays.length*100)+'%';
+    },d);
+  });
+
+  setTimeout(()=>{
+    document.getElementById('sys-ready').classList.add('show');
+    sfx.allOn();
+    setTimeout(()=>{ ST='ready-minds'; },700);
+  },3850);
+}
+
+/* ── PHASE: FIVE MINDS ─────────────────────────── */
+function buildMinds() {
+  const row=document.getElementById('minds-row'); row.innerHTML='';
+  CFG.minds.forEach((m,i)=>{
+    const c=document.createElement('div'); c.className='mind-card'; c.id='mc-'+i;
+    c.innerHTML=`<span class="m-key">[${m.key}]</span><span class="m-icon">${m.emoji}</span><span class="m-label">${m.label}</span><span class="m-status">■ ACTIVE</span>`;
+    c.onclick=()=>activateMind(i);
+    row.appendChild(c);
+  });
+}
+function startMinds() {
+  ST='minds'; buildMinds();
+  mindsOn=0; mindsArr=[false,false,false,false,false];
+  updateTally(); show('s-minds'); sfx.tick();
+}
+function activateMind(i) {
+  if(ST!=='minds'||mindsArr[i]) return;
+  mindsArr[i]=true; mindsOn++;
+  document.getElementById('mc-'+i).classList.add('active');
+  sfx.activate(); updateTally();
+  if(mindsOn===5){ sfx.allOn(); setTimeout(startLaunch,500); }
+}
+function updateTally() {
+  document.getElementById('minds-tally').textContent=
+    `AWAITING ACTIVATION \u00a0—\u00a0 ${mindsOn} / 5`;
+}
+
+/* ── PHASE: LAUNCH COUNTDOWN ───────────────────── */
+function startLaunch() {
+  ST='launch'; show('s-launch');
+  const disp=document.getElementById('launch-display');
+  const numEl=document.getElementById('launch-num');
+  let n=5; numEl.textContent=n; sfx.launch(n);
+
+  const iv=setInterval(()=>{
+    n--;
+    if(n===0){
+      clearInterval(iv);
+      disp.innerHTML='<div class="launch-word">🚀 LAUNCH</div>';
+      sfx.final();
+      setTimeout(()=>{ ST='chief'; showChief(); },1600);
+    } else {
+      numEl.style.animation='none'; void numEl.offsetWidth; numEl.style.animation='pop-in .8s cubic-bezier(.16,1,.3,1)';
+      numEl.textContent=n; sfx.launch(n);
+    }
+  },1000);
+}
+
+/* ── PHASE: CHIEF GUEST ────────────────────────── */
+function showChief() {
+  show('s-chief'); sfx.tick();
+}
+function handleEnter() {
+  if(ST!=='chief') return;
+  ST='access'; sfx.enter(); showAccess();
+}
+document.getElementById('enter-btn').onclick=handleEnter;
+
+/* ── PHASE: ACCESS GRANTED ─────────────────────── */
+function showAccess() {
+  show('s-access');
+  const wrap=document.getElementById('access-wrap'); wrap.innerHTML='';
+
+  const steps=[
+    { text:'> RUN: INTERNAL_HACKATHON_2026',   cls:'access-line',           delay:200  },
+    { text:'',                                  cls:'access-line',           delay:500  },
+    { text:'AUTHENTICATING.........',           cls:'access-line',           delay:700  },
+    { text:'ACCESS GRANTED',                    cls:'access-big',            delay:1300 },
+    { text:'',                                  cls:'access-line',           delay:1700 },
+    { text:'████████████████████████',          cls:'progress-row',          delay:1900 },
+    { text:'    HACKATHON STARTED',             cls:'hackathon-started',     delay:2200 },
+    { text:'████████████████████████',          cls:'progress-row',          delay:2500 },
+  ];
+
+  steps.forEach(({text,cls,delay})=>{
+    setTimeout(()=>{
+      const d=document.createElement('div'); d.className=cls; d.textContent=text;
+      wrap.appendChild(d);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>d.classList.add('show')));
+      if(text) tone(text.includes('GRANTED')||text.includes('STARTED')?880:440,.07,'square',.1);
+    },delay);
+  });
+
+  setTimeout(()=>{
+    sfx.final();
+    setTimeout(()=>{ ST='teams'; teamIdx=0; showTeams(); },2200);
+  },3300);
+}
+
+/* ── PHASE: TEAM REVEAL ────────────────────────── */
+function showTeams() {
+  show('s-teams'); renderTeam(teamIdx);
+}
+function renderTeam(i) {
+  const t=CFG.teams[i];
+  document.getElementById('team-counter').textContent=
+    `TEAM ${String(i+1).padStart(2,'0')} \u00a0/\u00a0 ${String(CFG.teams.length).padStart(2,'0')}`;
+  const hasMembers = t.members && t.members.some(m => m !== '—');
+  const hasPS      = t.ps && t.ps.trim() !== '';
+  document.getElementById('team-display').innerHTML=`
+    <div class="team-num-badge">[ TEAM ${String(i+1).padStart(2,'0')} OF ${CFG.teams.length} ]</div>
+    <div class="team-initials">${t.init}</div>
+    <div class="team-name-big">${t.name}</div>
+    ${hasMembers ? `<div class="team-members-list">${t.members.join(' &nbsp;&middot;&nbsp; ')}</div>` : ''}
+    ${hasPS      ? `<div class="team-ps">${t.ps}</div>` : ''}
+  `;
+  sfx.team();
+}
+function nextTeam() {
+  if(ST!=='teams') return;
+  teamIdx++;
+  if(teamIdx>=CFG.teams.length){ ST='combine'; showCombine(); }
+  else renderTeam(teamIdx);
+}
+function prevTeam() {
+  if(ST!=='teams'||teamIdx===0) return;
+  teamIdx--; renderTeam(teamIdx);
+}
+
+/* ── PHASE: COMBINE ────────────────────────────── */
+function showCombine() {
+  show('s-combine');
+  const chips=document.getElementById('combine-chips'); chips.innerHTML='';
+  const arrow=document.getElementById('combine-arrow');
+  const title=document.getElementById('combine-title');
+  arrow.classList.remove('show'); title.classList.remove('show');
+
+  CFG.teams.forEach((t,i)=>{
+    const s=document.createElement('span'); s.className='ci-chip'; s.textContent=t.init;
+    chips.appendChild(s);
+    setTimeout(()=>{ s.classList.add('show'); tone(440+i*35,.07,'square',.09); },i*200);
+  });
+
+  setTimeout(()=>{
+    arrow.classList.add('show'); sfx.allOn();
+    setTimeout(()=>{
+      title.classList.add('show'); sfx.final();
+      setTimeout(()=>{ ST='final'; showFinal(); },3200);
+    },700);
+  },CFG.teams.length*200+500);
+}
+
+/* ── PHASE: FINAL ──────────────────────────────── */
+function showFinal() {
+  show('s-final');
+  const ids=['f1','f2','f3','fhn','ftag','fcta'];
+  const dels=[200,750,1300,2100,2900,3700];
+  ids.forEach((id,i)=>{
+    setTimeout(()=>{
+      document.getElementById(id).classList.add('show');
+      tone(440+i*55,.07,'square',.09);
+    },dels[i]);
+  });
+  setTimeout(sfx.final, 3700);
+}
+
+/* ── INPUT HANDLING ────────────────────────────── */
+function advance() {
+  switch(ST){
+    case 'intro':       startCountdown(); break;
+    case 'ready-minds': startMinds();     break;
+    case 'teams':       nextTeam();       break;
+  }
+}
+
+document.addEventListener('click', e=>{
+  if(e.target.closest('#enter-btn')||e.target.closest('.mind-card')) return;
+  advance();
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='f'||e.key==='F'){
+    document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(()=>{});
+    return;
+  }
+  if(e.key==='Enter'){ handleEnter(); return; }
+  if(e.key===' '||e.key==='ArrowRight'){ e.preventDefault(); advance(); return; }
+  if(e.key==='ArrowLeft'){ prevTeam(); return; }
+
+  // 1–5: activate minds
+  const n=parseInt(e.key)-1;
+  if(!isNaN(n)&&n>=0&&n<5) activateMind(n);
+});
+
+/* ── INIT ──────────────────────────────────────── */
+buildMinds();
+</script>
+</body>
+</html>
